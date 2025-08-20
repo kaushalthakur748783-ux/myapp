@@ -1,0 +1,75 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-11-jdk \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel \
+            libffi-dev \
+            libssl-dev \
+            libsqlite3-dev \
+            zlib1g-dev \
+            libncurses5-dev \
+            libjpeg-dev \
+            libfreetype6-dev \
+            libblas-dev \
+            liblapack-dev \
+            libgmp-dev \
+            libx11-dev \
+            libgl1-mesa-dev \
+            libgles2-mesa-dev \
+            libglu1-mesa-dev \
+            xclip \
+            xsel \
+            pkg-config \
+            libffi-dev \
+            liblzma-dev \
+            cmake \
+            ninja-build \
+            ccache \
+            libtool \
+            automake \
+            autoconf \
+            gettext \
+            android-sdk \
+            android-sdk-platform-tools
+
+          pip install --upgrade pip
+          pip install buildozer cython
+
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-apk
+          path: bin/*.apk
